@@ -25,7 +25,7 @@ public final class Exceptions {
         } catch (final RuntimeException rethrownException) {
             throw rethrownException;
         } catch (final Exception rethrownException) {
-            throw new RuntimeException(rethrownException);
+            throw new RuntimeCheckedException(rethrownException);
         }
     }
 
@@ -38,7 +38,7 @@ public final class Exceptions {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception t) {
-            throw new RuntimeException(t);
+            throw new RuntimeCheckedException(t);
         }
     }
 
@@ -51,7 +51,7 @@ public final class Exceptions {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception t) {
-            throw new RuntimeException(t);
+            throw new RuntimeCheckedException(t);
         }
     }
 
