@@ -8,7 +8,7 @@ public final class IllegalDataModelStateException extends RuntimeException {
         super();
     }
 
-    public IllegalDataModelStateException(final Throwable cause) {
+    public IllegalDataModelStateException(final Exception cause) {
         super(cause);
     }
 
@@ -16,7 +16,7 @@ public final class IllegalDataModelStateException extends RuntimeException {
         super(message);
     }
 
-    public IllegalDataModelStateException(final String message, final Throwable cause) {
+    public IllegalDataModelStateException(final String message, final Exception cause) {
         super(message, cause);
     }
 }

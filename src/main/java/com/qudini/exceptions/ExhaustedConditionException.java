@@ -8,11 +8,11 @@ public final class ExhaustedConditionException extends RuntimeException {
         super(message);
     }
 
-    public ExhaustedConditionException(Throwable throwable) {
-        super(throwable);
+    public ExhaustedConditionException(Exception exception) {
+        super(exception);
     }
 
-    public ExhaustedConditionException(String message, Throwable throwable) {
-        super(message, throwable);
+    public ExhaustedConditionException(String message, Exception exception) {
+        super(message, exception);
     }
 }

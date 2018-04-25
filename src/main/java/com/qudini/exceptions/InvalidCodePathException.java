@@ -17,7 +17,7 @@ public final class InvalidCodePathException extends IllegalStateException {
         super(MESSAGE);
     }
 
-    public InvalidCodePathException(@Nonnull final Throwable cause) {
+    public InvalidCodePathException(@Nonnull final Exception cause) {
         super(MESSAGE, cause);
     }
 }

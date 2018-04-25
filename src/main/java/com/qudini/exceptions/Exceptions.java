@@ -19,12 +19,12 @@ public final class Exceptions {
      * and to leak implementation details. This also alleviates the annoying interplay between lambdas and
      * compile-checked exceptions.
      */
-    public static void throwUnchecked(final Throwable throwable) {
+    public static void throwUnchecked(final Exception exception) {
         try {
-            throw throwable;
-        } catch (final RuntimeException | Error rethrownException) {
+            throw exception;
+        } catch (final RuntimeException rethrownException) {
             throw rethrownException;
-        } catch (final Throwable rethrownException) {
+        } catch (final Exception rethrownException) {
             throw new RuntimeException(rethrownException);
         }
     }
@@ -35,9 +35,9 @@ public final class Exceptions {
     public static <T> T unchecked(PotentiallyErroneous<T> f) {
         try {
             return f.run();
-        } catch (Error | RuntimeException e) {
+        } catch (RuntimeException e) {
             throw e;
-        } catch (Throwable t) {
+        } catch (Exception t) {
             throw new RuntimeException(t);
         }
     }
@@ -48,9 +48,9 @@ public final class Exceptions {
     public static void unchecked(PotentiallyErroneousWithoutResult f) {
         try {
             f.run();
-        } catch (Error | RuntimeException e) {
+        } catch (RuntimeException e) {
             throw e;
-        } catch (Throwable t) {
+        } catch (Exception t) {
             throw new RuntimeException(t);
         }
     }
@@ -79,8 +79,8 @@ public final class Exceptions {
     public static <A> Optional<A> reportQuietly(List<Reporter> reporters, PotentiallyErroneous<A> f) {
         try {
             return Optional.of(f.run());
-        } catch (Throwable t) {
-            reporters.forEach(reporter -> reporter.report(t));
+        } catch (Exception e) {
+            reporters.forEach(reporter -> reporter.report(e));
             return Optional.empty();
         }
     }
@@ -122,9 +122,9 @@ public final class Exceptions {
     public static <A> A reportAndRethrow(List<Reporter> reporters, PotentiallyErroneous<A> f) {
         try {
             return f.run();
-        } catch (Throwable t) {
-            reporters.forEach(reporter -> reporter.report(t));
-            throwUnchecked(t);
+        } catch (Exception e) {
+            reporters.forEach(reporter -> reporter.report(e));
+            throwUnchecked(e);
             throw new InvalidCodePathException();
         }
     }
@@ -150,7 +150,7 @@ public final class Exceptions {
     public interface PotentiallyErroneous<A> {
 
         @CheckReturnValue
-        A run() throws Throwable;
+        A run() throws Exception;
     }
 
     /**
@@ -158,14 +158,14 @@ public final class Exceptions {
      */
     @FunctionalInterface
     public interface PotentiallyErroneousWithoutResult {
-        void run() throws Throwable;
+        void run() throws Exception;
     }
 
     @FunctionalInterface
     public interface Reporter {
-        void report(String message, Throwable cause);
+        void report(String message, Exception cause);
 
-        default void report(Throwable cause) {
+        default void report(Exception cause) {
             report(cause.getMessage(), cause);
         }
     }
