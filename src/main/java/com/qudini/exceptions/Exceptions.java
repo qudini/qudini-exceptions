@@ -30,6 +30,32 @@ public final class Exceptions {
     }
 
     /**
+     * Runs a block of code in which compile-time exceptions are converted to runtime exceptions.
+     */
+    public static <T> T unchecked(PotentiallyErroneous<T> f) {
+        try {
+            return f.run();
+        } catch (Error | RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    /**
+     * Runs a block of code in which compile-time exceptions are converted to runtime exceptions.
+     */
+    public static void unchecked(PotentiallyErroneousWithoutResult f) {
+        try {
+            f.run();
+        } catch (Error | RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    /**
      * Report errors but continue without throwing an exception. This is designed for events whose breakages should be
      * logged, but should not break execution flow.
      * <p>
