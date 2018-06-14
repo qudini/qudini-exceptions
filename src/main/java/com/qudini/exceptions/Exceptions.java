@@ -2,10 +2,10 @@ package com.qudini.exceptions;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 
 /**
@@ -31,7 +31,7 @@ public final class Exceptions {
         throw new UtilityClassInstantiatedException();
     }
 
-    private static final ExceptionsService exceptionsService = new ExceptionsService(emptySet(), emptyList());
+    private static final ExceptionsService exceptionsService = new ExceptionsService(emptySet(), emptySet());
 
     /**
      * @deprecated Use {@link ExceptionsService#throwUnchecked(Exception)} instead.
@@ -92,7 +92,7 @@ public final class Exceptions {
     @Deprecated
     @Nonnull
     public static <A> Optional<A> reportQuietly(List<Reporter> reporters, PotentiallyErroneous<A> f) {
-        return new ExceptionsService(emptySet(), reporters).reportQuietly(f);
+        return new ExceptionsService(emptySet(), new HashSet<>(reporters)).reportQuietly(f);
     }
 
     /**
@@ -103,7 +103,7 @@ public final class Exceptions {
      */
     @Deprecated
     public static void reportQuietly(List<Reporter> reporters, PotentiallyErroneousWithoutResult f) {
-        new ExceptionsService(emptySet(), reporters).reportQuietly(f);
+        new ExceptionsService(emptySet(), new HashSet<>(reporters)).reportQuietly(f);
     }
 
     /**
@@ -130,7 +130,7 @@ public final class Exceptions {
     @Deprecated
     @Nonnull
     public static <A> A reportAndRethrow(List<Reporter> reporters, PotentiallyErroneous<A> f) {
-        return new ExceptionsService(emptySet(), reporters).reportAndRethrow(f);
+        return new ExceptionsService(emptySet(), new HashSet<>(reporters)).reportAndRethrow(f);
     }
 
     /**
@@ -141,7 +141,7 @@ public final class Exceptions {
      */
     @Deprecated
     public static void reportAndRethrow(List<Reporter> reporters, PotentiallyErroneousWithoutResult f) {
-        new ExceptionsService(emptySet(), reporters).reportAndRethrow(f);
+        new ExceptionsService(emptySet(), new HashSet<>(reporters)).reportAndRethrow(f);
     }
 
     /**

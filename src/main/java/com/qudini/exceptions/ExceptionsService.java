@@ -3,7 +3,6 @@ package com.qudini.exceptions;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,7 +23,7 @@ import java.util.Set;
 public class ExceptionsService {
 
     private final Set<Class<? extends Exception>> exceptionsToIgnore;
-    private final List<? extends Reporter> reporters;
+    private final Set<? extends Reporter> reporters;
 
     /**
      * @return exception utilities that work on all exceptions derived from `java.lang.Exception`, except for
@@ -35,7 +34,7 @@ public class ExceptionsService {
      * Features that use reporting, such as {@link #reportAndRethrow(PotentiallyErroneousWithoutResult)}, will use the
      * provided reporters. These can, for example, use specific logging or report to external error reporting services.
      */
-    public ExceptionsService(Set<Class<? extends Exception>> exceptionsToIgnore, List<? extends Reporter> reporters) {
+    public ExceptionsService(Set<Class<? extends Exception>> exceptionsToIgnore, Set<? extends Reporter> reporters) {
         this.exceptionsToIgnore = exceptionsToIgnore;
         this.reporters = reporters;
     }

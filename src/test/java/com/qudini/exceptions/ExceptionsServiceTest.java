@@ -3,12 +3,12 @@ package com.qudini.exceptions;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.*;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ExceptionsServiceTest {
@@ -18,8 +18,8 @@ public class ExceptionsServiceTest {
             ExcludedException2.class
     ));
 
-    private ExceptionsService exceptionsServiceForAll = new ExceptionsService(emptySet(), emptyList());
-    private ExceptionsService exceptionsServiceExcluding = new ExceptionsService(excludedExceptions, emptyList());
+    private ExceptionsService exceptionsServiceForAll = new ExceptionsService(emptySet(), emptySet());
+    private ExceptionsService exceptionsServiceExcluding = new ExceptionsService(excludedExceptions, emptySet());
 
     @Test
     public void throwUnchecked() {
@@ -71,7 +71,7 @@ public class ExceptionsServiceTest {
     @Test
     public void reportAndRethrow() {
         AtomicInteger reportCount = new AtomicInteger();
-        List<ExceptionsService.Reporter> reporters = singletonList((e, m) -> reportCount.incrementAndGet());
+        Set<ExceptionsService.Reporter> reporters = singleton((e, m) -> reportCount.incrementAndGet());
 
         try {
             new ExceptionsService(emptySet(), reporters).reportAndRethrow(() -> {
