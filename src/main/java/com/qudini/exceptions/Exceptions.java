@@ -5,6 +5,9 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+
 /**
  * @deprecated Use {@link ExceptionsService} instead.
  * <p>
@@ -28,7 +31,7 @@ public final class Exceptions {
         throw new UtilityClassInstantiatedException();
     }
 
-    private static final ExceptionsService exceptionsService = ExceptionsService.forAll();
+    private static final ExceptionsService exceptionsService = new ExceptionsService(emptySet(), emptyList());
 
     /**
      * @deprecated Use {@link ExceptionsService#throwUnchecked(Exception)} instead.
@@ -65,7 +68,7 @@ public final class Exceptions {
     }
 
     /**
-     * @deprecated Use {@link ExceptionsService#reportQuietly(List, ExceptionsService.PotentiallyErroneous)} instead.
+     * @deprecated Use {@link ExceptionsService#reportQuietly(ExceptionsService.PotentiallyErroneous)} instead.
      * <p>
      * Report errors but continue without throwing an exception. This is designed for events whose breakages should be
      * logged, but should not break execution flow.
@@ -89,22 +92,22 @@ public final class Exceptions {
     @Deprecated
     @Nonnull
     public static <A> Optional<A> reportQuietly(List<Reporter> reporters, PotentiallyErroneous<A> f) {
-        return exceptionsService.reportQuietly(reporters, f);
+        return new ExceptionsService(emptySet(), reporters).reportQuietly(f);
     }
 
     /**
      * @deprecated Use
-     * {@link ExceptionsService#reportQuietly(List, ExceptionsService.PotentiallyErroneousWithoutResult)} instead.
+     * {@link ExceptionsService#reportQuietly(ExceptionsService.PotentiallyErroneousWithoutResult)} instead.
      * <p>
      * @see #reportQuietly(List, PotentiallyErroneous)
      */
     @Deprecated
     public static void reportQuietly(List<Reporter> reporters, PotentiallyErroneousWithoutResult f) {
-        exceptionsService.reportQuietly(reporters, f);
+        new ExceptionsService(emptySet(), reporters).reportQuietly(f);
     }
 
     /**
-     * @deprecated Use {@link ExceptionsService#reportAndRethrow(List, ExceptionsService.PotentiallyErroneous)} instead.
+     * @deprecated Use {@link ExceptionsService#reportAndRethrow(ExceptionsService.PotentiallyErroneous)} instead.
      * <p>
      * Report errors and then continue throwing the exception. This is designed for exceptions that we want explicitly
      * to be logged to services like NewRelic.
@@ -127,18 +130,18 @@ public final class Exceptions {
     @Deprecated
     @Nonnull
     public static <A> A reportAndRethrow(List<Reporter> reporters, PotentiallyErroneous<A> f) {
-        return exceptionsService.reportAndRethrow(reporters, f);
+        return new ExceptionsService(emptySet(), reporters).reportAndRethrow(f);
     }
 
     /**
      * @deprecated Use
-     * {@link ExceptionsService#reportAndRethrow(List, ExceptionsService.PotentiallyErroneousWithoutResult)} instead.
+     * {@link ExceptionsService#reportAndRethrow(ExceptionsService.PotentiallyErroneousWithoutResult)} instead.
      * <p>
      * @see #reportAndRethrow(List, PotentiallyErroneous)
      */
     @Deprecated
     public static void reportAndRethrow(List<Reporter> reporters, PotentiallyErroneousWithoutResult f) {
-        exceptionsService.reportAndRethrow(reporters, f);
+        new ExceptionsService(emptySet(), reporters).reportAndRethrow(f);
     }
 
     /**

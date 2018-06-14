@@ -2,20 +2,24 @@ package com.qudini.exceptions;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
+import static java.util.Collections.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ExceptionsServiceTest {
 
-    private ExceptionsService exceptionsServiceForAll = ExceptionsService.forAll();
-    private ExceptionsService exceptionsServiceExcluding = ExceptionsService.bypassing(
+    private static final Set<Class<? extends Exception>> excludedExceptions = new HashSet<>(asList(
             ExcludedException1.class,
             ExcludedException2.class
-    );
+    ));
+
+    private ExceptionsService exceptionsServiceForAll = new ExceptionsService(emptySet(), emptyList());
+    private ExceptionsService exceptionsServiceExcluding = new ExceptionsService(excludedExceptions, emptyList());
 
     @Test
     public void throwUnchecked() {
@@ -51,12 +55,12 @@ public class ExceptionsServiceTest {
 
     @Test
     public void reportQuietly() {
-        exceptionsServiceForAll.reportQuietly(emptyList(), () -> {
+        exceptionsServiceForAll.reportQuietly(() -> {
             throw new Exception();
         });
 
         try {
-            exceptionsServiceExcluding.reportQuietly(emptyList(), () -> {
+            exceptionsServiceExcluding.reportQuietly(() -> {
                 throw new ExcludedException1();
             });
             fail();
@@ -70,24 +74,18 @@ public class ExceptionsServiceTest {
         List<ExceptionsService.Reporter> reporters = singletonList((e, m) -> reportCount.incrementAndGet());
 
         try {
-            exceptionsServiceForAll.reportAndRethrow(
-                    reporters,
-                    () -> {
-                        throw new UnsupportedOperationException();
-                    }
-            );
+            new ExceptionsService(emptySet(), reporters).reportAndRethrow(() -> {
+                throw new UnsupportedOperationException();
+            });
             fail();
         } catch (UnsupportedOperationException exception) {
             assertEquals(reportCount.get(), 1);
         }
 
         try {
-            exceptionsServiceExcluding.reportAndRethrow(
-                    reporters,
-                    () -> {
-                        throw new ExcludedException1();
-                    }
-            );
+            new ExceptionsService(excludedExceptions, reporters).reportAndRethrow(() -> {
+                throw new ExcludedException1();
+            });
             fail();
         } catch (ExcludedException1 exception) {
             assertEquals(reportCount.get(), 1);

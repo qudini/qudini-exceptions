@@ -3,13 +3,9 @@ package com.qudini.exceptions;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
 
 /**
  * Utilities for handling exceptions. These include:
@@ -28,32 +24,20 @@ import static java.util.Collections.emptySet;
 public class ExceptionsService {
 
     private final Set<Class<? extends Exception>> exceptionsToIgnore;
-
-    private ExceptionsService(Set<Class<? extends Exception>> exceptionsToIgnore) {
-        this.exceptionsToIgnore = exceptionsToIgnore;
-    }
-
-    /**
-     * @return exception utilities that work on all exceptions derived from `java.lang.Exception`.
-     */
-    public static ExceptionsService forAll() {
-        return new ExceptionsService(emptySet());
-    }
+    private final List<? extends Reporter> reporters;
 
     /**
      * @return exception utilities that work on all exceptions derived from `java.lang.Exception`, except for
-     * {@code exceptionsToIgnore}. These exceptions work as if these utilities were not used at all; for example,
+     * {@code exceptionsToIgnore}. Ignored exceptions work as if these utilities were not used at all; for example,
      * {@link #reportQuietly} and {@link #reportAndRethrow} will not report these and just keep throwing the exception
      * as normal.
+     * <p>
+     * Features that use reporting, such as {@link #reportAndRethrow(PotentiallyErroneousWithoutResult)}, will use the
+     * provided reporters. These can, for example, use specific logging or report to external error reporting services.
      */
-    public static ExceptionsService bypassing(Class<? extends Exception>... exceptionsToIgnore) {
-        return new ExceptionsService(new HashSet<>(asList(exceptionsToIgnore)));
-    }
-
-    private boolean toBeBypassed(Exception exception) {
-        return exceptionsToIgnore
-                .stream()
-                .anyMatch(toIgnore -> toIgnore.isInstance(exception));
+    public ExceptionsService(Set<Class<? extends Exception>> exceptionsToIgnore, List<? extends Reporter> reporters) {
+        this.exceptionsToIgnore = exceptionsToIgnore;
+        this.reporters = reporters;
     }
 
     /**
@@ -120,7 +104,7 @@ public class ExceptionsService {
      * <p>
      */
     @Nonnull
-    public <A> Optional<A> reportQuietly(List<? extends Reporter> reporters, PotentiallyErroneous<A> f) {
+    public <A> Optional<A> reportQuietly(PotentiallyErroneous<A> f) {
         try {
             return Optional.of(f.run());
         } catch (Exception e) {
@@ -135,12 +119,12 @@ public class ExceptionsService {
     }
 
     /**
-     * @see #reportQuietly(List, PotentiallyErroneous)
+     * @see #reportQuietly(PotentiallyErroneous)
      */
-    public void reportQuietly(List<? extends Reporter> reporters, PotentiallyErroneousWithoutResult f) {
+    public void reportQuietly(PotentiallyErroneousWithoutResult f) {
 
         // The only case where @CheckReturnValue should be ignored for `#reportQuietly`.
-        reportQuietly(reporters, () -> {
+        reportQuietly(() -> {
             f.run();
 
             // A silly throwaway value, since the only valid value of Void is null, which crashes `Optional#of`.
@@ -168,7 +152,7 @@ public class ExceptionsService {
      * }</pre>
      */
     @Nonnull
-    public <A> A reportAndRethrow(List<? extends Reporter> reporters, PotentiallyErroneous<A> f) {
+    public <A> A reportAndRethrow(PotentiallyErroneous<A> f) {
         try {
             return f.run();
         } catch (Exception e) {
@@ -181,12 +165,12 @@ public class ExceptionsService {
     }
 
     /**
-     * @see #reportAndRethrow(List, PotentiallyErroneous)
+     * @see #reportAndRethrow(PotentiallyErroneous)
      */
-    public void reportAndRethrow(List<? extends Reporter> reporters, PotentiallyErroneousWithoutResult f) {
+    public void reportAndRethrow(PotentiallyErroneousWithoutResult f) {
 
         // The only case where @CheckReturnValue should be ignored for `#reportAndRethrow`.
-        reportAndRethrow(reporters, () -> {
+        reportAndRethrow(() -> {
             f.run();
 
             // A silly throwaway value, since the only valid value of Void is null, which crashes `Optional#of`.
@@ -194,8 +178,14 @@ public class ExceptionsService {
         });
     }
 
+    private boolean toBeBypassed(Exception exception) {
+        return exceptionsToIgnore
+                .stream()
+                .anyMatch(toIgnore -> toIgnore.isInstance(exception));
+    }
+
     /**
-     * @see #reportQuietly(List, PotentiallyErroneous)
+     * @see #reportQuietly(PotentiallyErroneous)
      */
     @FunctionalInterface
     public interface PotentiallyErroneous<A> {
@@ -205,7 +195,7 @@ public class ExceptionsService {
     }
 
     /**
-     * @see #reportQuietly(List, PotentiallyErroneousWithoutResult)
+     * @see #reportQuietly(PotentiallyErroneousWithoutResult)
      */
     @FunctionalInterface
     public interface PotentiallyErroneousWithoutResult {
