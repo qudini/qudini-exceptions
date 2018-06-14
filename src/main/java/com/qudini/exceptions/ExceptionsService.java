@@ -51,10 +51,9 @@ public class ExceptionsService {
     }
 
     private boolean toBeBypassed(Exception exception) {
-        Class<?> exceptionClass = exception.getClass();
         return exceptionsToIgnore
                 .stream()
-                .anyMatch(toIgnore -> toIgnore.isAssignableFrom(exceptionClass));
+                .anyMatch(toIgnore -> toIgnore.isInstance(exception));
     }
 
     /**
@@ -127,9 +126,11 @@ public class ExceptionsService {
         } catch (Exception e) {
             if (toBeBypassed(e)) {
                 throwUnchecked(e);
+                throw new InvalidCodePathException();
+            } else {
+                reporters.forEach(reporter -> reporter.report(e));
+                return Optional.empty();
             }
-            reporters.forEach(reporter -> reporter.report(e));
-            return Optional.empty();
         }
     }
 
