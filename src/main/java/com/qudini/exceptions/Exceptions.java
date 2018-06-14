@@ -5,6 +5,22 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @deprecated Use {@link ExceptionsService} instead.
+ * <p>
+ * Utilities for handling exceptions. These include:
+ * <ul>
+ * <li>Turning checked exceptions into unchecked ones.</li>
+ * <li>Converting all checked exceptions thrown in a code block to unchecked.</li>
+ * <li>
+ * Reporting exceptions through application-specific error-reporting tools, but continuing as usual afterwards
+ * </li>
+ * <li>
+ * Reporting exceptions through application-specific error-reporting tools, and then rethrowing the exception.
+ * </li>
+ * </ul>
+ */
+@Deprecated
 @CheckReturnValue
 public final class Exceptions {
 
@@ -12,50 +28,45 @@ public final class Exceptions {
         throw new UtilityClassInstantiatedException();
     }
 
+    private static final ExceptionsService exceptionsService = ExceptionsService.forAll();
+
     /**
+     * @deprecated Use {@link ExceptionsService#throwUnchecked(Exception)} instead.
+     * <p>
      * Throws an exception at runtime, even if it's compile-checked.
      * <p>
      * This is useful for using APIs which misuse compile-checked exceptions, forcing its consumers to code verbosely
      * and to leak implementation details. This also alleviates the annoying interplay between lambdas and
      * compile-checked exceptions.
      */
+    @Deprecated
     public static void throwUnchecked(final Exception exception) {
-        try {
-            throw exception;
-        } catch (final RuntimeException rethrownException) {
-            throw rethrownException;
-        } catch (final Exception rethrownException) {
-            throw new RuntimeCheckedException(rethrownException);
-        }
+        exceptionsService.throwUnchecked(exception);
     }
 
     /**
+     * @deprecated Use {@link ExceptionsService#unchecked(ExceptionsService.PotentiallyErroneous)} instead.
+     * <p>
      * Runs a block of code in which compile-time exceptions are converted to runtime exceptions.
      */
+    @Deprecated
     public static <T> T unchecked(PotentiallyErroneous<T> f) {
-        try {
-            return f.run();
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception t) {
-            throw new RuntimeCheckedException(t);
-        }
+        return exceptionsService.unchecked(f);
     }
 
     /**
+     * @deprecated Use {@link ExceptionsService#unchecked(ExceptionsService.PotentiallyErroneousWithoutResult)} instead.
+     * <p>
      * Runs a block of code in which compile-time exceptions are converted to runtime exceptions.
      */
+    @Deprecated
     public static void unchecked(PotentiallyErroneousWithoutResult f) {
-        try {
-            f.run();
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception t) {
-            throw new RuntimeCheckedException(t);
-        }
+        exceptionsService.unchecked(f);
     }
 
     /**
+     * @deprecated Use {@link ExceptionsService#reportQuietly(List, ExceptionsService.PotentiallyErroneous)} instead.
+     * <p>
      * Report errors but continue without throwing an exception. This is designed for events whose breakages should be
      * logged, but should not break execution flow.
      * <p>
@@ -75,31 +86,26 @@ public final class Exceptions {
      * }</pre>
      * <p>
      */
+    @Deprecated
     @Nonnull
     public static <A> Optional<A> reportQuietly(List<Reporter> reporters, PotentiallyErroneous<A> f) {
-        try {
-            return Optional.of(f.run());
-        } catch (Exception e) {
-            reporters.forEach(reporter -> reporter.report(e));
-            return Optional.empty();
-        }
+        return exceptionsService.reportQuietly(reporters, f);
     }
 
     /**
+     * @deprecated Use
+     * {@link ExceptionsService#reportQuietly(List, ExceptionsService.PotentiallyErroneousWithoutResult)} instead.
+     * <p>
      * @see #reportQuietly(List, PotentiallyErroneous)
      */
+    @Deprecated
     public static void reportQuietly(List<Reporter> reporters, PotentiallyErroneousWithoutResult f) {
-
-        // The only case where @CheckReturnValue should be ignored for `#reportQuietly`.
-        reportQuietly(reporters, () -> {
-            f.run();
-
-            // A silly throwaway value, since the only valid value of Void is null, which crashes `Optional#of`.
-            return Boolean.TRUE;
-        });
+        exceptionsService.reportQuietly(reporters, f);
     }
 
     /**
+     * @deprecated Use {@link ExceptionsService#reportAndRethrow(List, ExceptionsService.PotentiallyErroneous)} instead.
+     * <p>
      * Report errors and then continue throwing the exception. This is designed for exceptions that we want explicitly
      * to be logged to services like NewRelic.
      * <p>
@@ -118,55 +124,48 @@ public final class Exceptions {
      * );
      * }</pre>
      */
+    @Deprecated
     @Nonnull
     public static <A> A reportAndRethrow(List<Reporter> reporters, PotentiallyErroneous<A> f) {
-        try {
-            return f.run();
-        } catch (Exception e) {
-            reporters.forEach(reporter -> reporter.report(e));
-            throwUnchecked(e);
-            throw new InvalidCodePathException();
-        }
+        return exceptionsService.reportAndRethrow(reporters, f);
     }
 
     /**
+     * @deprecated Use
+     * {@link ExceptionsService#reportAndRethrow(List, ExceptionsService.PotentiallyErroneousWithoutResult)} instead.
+     * <p>
      * @see #reportAndRethrow(List, PotentiallyErroneous)
      */
+    @Deprecated
     public static void reportAndRethrow(List<Reporter> reporters, PotentiallyErroneousWithoutResult f) {
-
-        // The only case where @CheckReturnValue should be ignored for `#reportAndRethrow`.
-        reportAndRethrow(reporters, () -> {
-            f.run();
-
-            // A silly throwaway value, since the only valid value of Void is null, which crashes `Optional#of`.
-            return Boolean.TRUE;
-        });
+        exceptionsService.reportAndRethrow(reporters, f);
     }
 
     /**
+     * @deprecated Use {@link ExceptionsService.PotentiallyErroneous} instead.
+     * <p>
      * @see #reportQuietly(List, PotentiallyErroneous)
      */
+    @Deprecated
     @FunctionalInterface
-    public interface PotentiallyErroneous<A> {
-
-        @CheckReturnValue
-        A run() throws Exception;
+    public interface PotentiallyErroneous<T> extends ExceptionsService.PotentiallyErroneous<T> {
     }
 
     /**
+     * @deprecated Use {@link ExceptionsService.PotentiallyErroneousWithoutResult} instead.
+     * <p>
      * @see #reportQuietly(List, PotentiallyErroneousWithoutResult)
      */
+    @Deprecated
     @FunctionalInterface
-    public interface PotentiallyErroneousWithoutResult {
-        void run() throws Exception;
+    public interface PotentiallyErroneousWithoutResult extends ExceptionsService.PotentiallyErroneousWithoutResult {
     }
 
+    /**
+     * @deprecated Use {@link ExceptionsService.Reporter} instead.
+     */
+    @Deprecated
     @FunctionalInterface
-    public interface Reporter {
-        void report(String message, Exception cause);
-
-        default void report(Exception cause) {
-            report(cause.getMessage(), cause);
-        }
+    public interface Reporter extends ExceptionsService.Reporter {
     }
 }
