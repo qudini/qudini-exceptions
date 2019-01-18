@@ -1,5 +1,7 @@
 # qudini-exceptions
 
+[![CircleCI](https://circleci.com/gh/qudini/qudini-exceptions.svg?style=svg)](https://circleci.com/gh/qudini/qudini-exceptions)
+
 Utilities for exception handling and general case common exception types.
 
 Provides exceptions such as:
