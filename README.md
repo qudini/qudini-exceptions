@@ -14,31 +14,25 @@ Provides exceptions such as:
 Report errors but continue without throwing an exception. This is designed for
 events whose breakages should be logged, but should not break execution flow.
 ```java
-Exceptions.reportQuietly(
-        Arrays.asList(
-                new NewRelicReporter(),
-                (message, exception) -> myOwnHandler(exception)
-        ),
-        () -> {
-            doSomethingThatMayCrash1();
-            doSomethingThatMayCrash2();
-            return successfulResult;
-        }
-);
+Set<Exception> exceptionsToIgnore = Set.of();
+List<Reporter> reporters = List.of(logger::error)
+var exceptions = ExceptionsService(exceptionsToIgnore, reporters);
+
+// [..]
+
+exceptions.reportQuietly(() -> {
+    doSomethingThatMayCrash1();
+    doSomethingThatMayCrash2();
+    return successfulResult;
+});
 ```
 
 Report errors and then continue throwing the exception. This is designed for
 exceptions that we want explicitly to be logged to services like NewRelic.
 ```java
-Exceptions.reportAndRethrow(
-        Arrays.asList(
-                new NewRelicReporter(),
-                (message, exception) -> myOwnHandler(exception)
-        ),
-        () -> {
-            doSomethingThatMayCrash1();
-            doSomethingThatMayCrash2();
-            return successfulResult;
-        }
-);
+exceptions.reportAndRethrow(() -> {
+    doSomethingThatMayCrash1();
+    doSomethingThatMayCrash2();
+    return successfulResult;
+});
 ```
