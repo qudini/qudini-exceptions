@@ -1,10 +1,28 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.qudini</groupId>
     <artifactId>qudini-exceptions</artifactId>
-    <version>1.0</version>
+    <packaging>pom</packaging>
+    <version>1.1-SNAPSHOT</version>
+    <name>qudini-exceptions</name>
+    <url>https://github.com/qudini/qudini-exceptions</url>
+    <properties>
+        <jdk.version>1.8</jdk.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+    <distributionManagement>
+        <repository>
+            <id>bintray-qudini-qudini-maven</id>
+            <name>qudini-qudini-maven</name>
+            <url>https://api.bintray.com/maven/qudini/qudini-maven/qudini-exceptions/;publish=1</url>
+        </repository>
+    </distributionManagement>
+    <scm>
+        <developerConnection>scm:git:git@github.com:qudini/qudini-exceptions.git</developerConnection>
+        <connection>scm:git:git@github.com:qudini/qudini-exceptions.git</connection>
+    </scm>
     <build>
         <plugins>
             <plugin>
@@ -12,8 +30,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -29,15 +47,6 @@
             </plugin>
         </plugins>
     </build>
-    <packaging>jar</packaging>
-
-    <name>qudini-exceptions</name>
-    <url>https://github.com/qudini/qudini-exceptions</url>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
