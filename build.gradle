@@ -20,8 +20,15 @@ group = 'com.qudini'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-publishing {
-    
+release {
+    failOnCommitNeeded = false
+    git {
+        requireBranch = 'gradle-build'
+        pushToRemote = 'origin'
+        pushToBranchPrefix = ''
+        commitVersionFileOnly = false
+        signTag = false
+    }
 }
 
 test {
