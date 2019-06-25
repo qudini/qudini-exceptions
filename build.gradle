@@ -24,10 +24,6 @@ release {
     failOnCommitNeeded = false
     git {
         requireBranch = 'gradle-build'
-        pushToRemote = 'origin'
-        pushToBranchPrefix = ''
-        commitVersionFileOnly = false
-        signTag = false
     }
 }
 
