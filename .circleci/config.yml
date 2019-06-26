@@ -38,15 +38,15 @@ jobs:
             - v1-dependencies-{{ checksum "pom.xml" }}
             - v1-dependencies-
 
-      - run: mvn dependency:go-offline
+      - run: ./gradlew clean
 
       - save_cache:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
 
-      - run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.${CIRCLE_BUILD_NUM} versions:commit
-      - run: mvn package
+      - run: ./gradlew build
+      - run: ./gradlew release -Prelease.useAutomaticVersion=true
       - run: mvn deploy -s .circleci/m2settings.xml
 
 workflows:
