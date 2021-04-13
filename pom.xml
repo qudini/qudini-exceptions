@@ -12,11 +12,11 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
     <distributionManagement>
-        <repository>
-            <id>qudini-maven-local</id>
-            <name>qudini-maven-local</name>
-            <url>https://qudini.jfrog.io/artifactory/qudini-maven-local/</url>
-        </repository>
+      <repository>
+        <id>central</id>
+        <name>Qudini-releases</name>
+        <url>https://qudini.jfrog.io/artifactory/qudini-maven-local</url>
+      </repository>
     </distributionManagement>
     <scm>
         <developerConnection>scm:git:git@github.com:qudini/qudini-exceptions.git</developerConnection>
